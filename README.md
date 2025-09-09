@@ -1,3 +1,5 @@
+PAGES: https://awaxnova.github.io/vscore/
+
 # Scoreboard PWA (BLE + Wi‑Fi fallback)
 
 A portable controller UI that talks to an ESP32‑based scoreboard display using **Web Bluetooth (BLE GATT)** when available, and falls back to **HTTP (Wi‑Fi SoftAP or LAN)** when not.
