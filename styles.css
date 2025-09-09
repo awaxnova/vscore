@@ -1,0 +1,39 @@
+:root {
+  --bg: #0b0e12;
+  --card: #12161c;
+  --text: #e8eef6;
+  --muted: #9fb3c8;
+  --accent: #0b84fe;
+  --danger: #ff5d5d;
+  --ok: #50c878;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; height: 100%; background: var(--bg); color: var(--text); font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+a { color: var(--accent); }
+button { cursor: pointer; }
+
+.container { max-width: 980px; margin: 0 auto; padding: 16px; }
+.card { background: var(--card); border-radius: 16px; padding: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.25); }
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.row-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.row-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.stack { display: grid; gap: 12px; }
+.header { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
+.tag { padding: 4px 8px; border-radius: 999px; background: #0c1220; color: var(--muted); font-size: 12px; border: 1px solid #22314a; }
+.input, select, button { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #22314a; background: #0c1220; color: var(--text); }
+button.primary { background: var(--accent); border: none; color: white; font-weight: 600; }
+button.tonal { background: #13213a; color: var(--text); }
+button.destructive { background: var(--danger); color: white; border: none; }
+button.ok { background: var(--ok); color: #07100b; border: none; }
+.hstack { display: flex; gap: 8px; align-items: center; }
+.score { font-size: 56px; font-weight: 800; text-align: center; }
+.small { font-size: 12px; color: var(--muted); }
+hr { border: none; border-top: 1px solid #22314a; margin: 12px 0; }
+.status-dot { width: 10px; height: 10px; border-radius: 999px; display: inline-block; margin-right: 6px; }
+.dot-ok { background: var(--ok); }
+.dot-busy { background: #ffd166; }
+.dot-bad { background: var(--danger); }
+.color-swatch { width: 20px; height: 20px; border-radius: 6px; border: 1px solid #22314a; }
+.center { text-align: center; }
+footer { margin-top: 24px; text-align: center; color: var(--muted); font-size: 12px; }

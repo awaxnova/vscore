@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Scoreboard Controller</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="styles.css">
+  <meta name="theme-color" content="#0b84fe"/>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Scoreboard Controller</h1>
+      <div class="hstack">
+        <span class="tag"><span id="swStatusDot" class="status-dot dot-busy"></span><span id="swStatusText">installing…</span></span>
+        <span class="tag"><span id="transportDot" class="status-dot dot-bad"></span><span id="transportText">disconnected</span></span>
+      </div>
+    </div>
+
+    <div class="stack">
+      <div class="card">
+        <div class="header">
+          <h3>Teams</h3>
+          <div class="hstack">
+            <button id="swapBtn" class="tonal">Swap sides</button>
+          </div>
+        </div>
+        <div class="row">
+          <div class="stack">
+            <input id="teamAName" class="input" placeholder="Team A name" maxlength="20" />
+            <div class="hstack">
+              <label class="small">Color</label>
+              <input id="teamAColor" type="color" value="#42a5f5" style="width:60px; padding: 4px;" />
+            </div>
+          </div>
+          <div class="stack">
+            <input id="teamBName" class="input" placeholder="Team B name" maxlength="20" />
+            <div class="hstack">
+              <label class="small">Color</label>
+              <input id="teamBColor" type="color" value="#ef5350" style="width:60px; padding: 4px;" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="row">
+          <div class="stack center">
+            <div class="small">Serving</div>
+            <div class="hstack center" style="justify-content:center">
+              <label class="hstack"><input type="radio" name="serving" value="A" id="serveA"> <span class="small">Team A</span></label>
+              <label class="hstack"><input type="radio" name="serving" value="B" id="serveB"> <span class="small">Team B</span></label>
+            </div>
+          </div>
+          <div class="stack row">
+            <div class="stack center card">
+              <div id="scoreA" class="score">0</div>
+              <div class="hstack">
+                <button id="plusA" class="primary">+1</button>
+                <button id="minusA" class="tonal">-1</button>
+              </div>
+            </div>
+            <div class="stack center card">
+              <div id="scoreB" class="score">0</div>
+              <div class="hstack">
+                <button id="plusB" class="primary">+1</button>
+                <button id="minusB" class="tonal">-1</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="row-4">
+          <div class="stack">
+            <label class="small">Set #</label>
+            <input id="setNumber" class="input" type="number" min="1" value="1" />
+          </div>
+          <div class="stack">
+            <label class="small">Match (A–B)</label>
+            <div class="hstack">
+              <input id="matchA" class="input" type="number" min="0" value="0" />
+              <input id="matchB" class="input" type="number" min="0" value="0" />
+            </div>
+          </div>
+          <div class="stack">
+            <label class="small">Best Of</label>
+            <select id="bestOf" class="input">
+              <option value="3">3</option>
+              <option value="5">5</option>
+            </select>
+          </div>
+          <div class="stack">
+            <label class="small">Actions</label>
+            <div class="hstack">
+              <button id="endSet" class="ok">End Set</button>
+              <button id="undo" class="tonal">Undo</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="header">
+          <h3>Connect</h3>
+          <span class="small">BLE preferred • Wi‑Fi fallback when BLE unsupported</span>
+        </div>
+        <div class="row">
+          <div class="stack">
+            <button id="connectBle" class="primary">Connect via Bluetooth</button>
+            <div class="small">Requires Chrome/Edge/Opera on desktop/Android. Use a tap/click to open the chooser.</div>
+          </div>
+          <div class="stack">
+            <div class="hstack">
+              <input id="wifiBaseUrl" class="input" placeholder="http://192.168.4.1 (ESP32 SoftAP)" />
+              <button id="connectWifi" class="tonal">Use Wi‑Fi</button>
+            </div>
+            <div class="small">Enable CORS on your ESP32 if hosting UI on GitHub Pages.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="header">
+          <h3>Console</h3>
+          <button id="clearLog" class="tonal">Clear</button>
+        </div>
+        <pre id="log" style="white-space: pre-wrap; max-height: 240px; overflow: auto; background:#0a0f1a; padding:12px; border-radius: 10px; border:1px solid #22314a;"></pre>
+      </div>
+    </div>
+
+    <footer>Scoreboard PWA • <a href="https://github.com/">GitHub Pages ready</a> • <span id="buildInfo"></span></footer>
+  </div>
+
+  <script type="module" src="app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js');
+    }
+  </script>
+</body>
+</html>
