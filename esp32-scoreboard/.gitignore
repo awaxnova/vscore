@@ -1,0 +1,35 @@
+# git ignore info for a platformio project
+
+
+# PlatformIO Core
+.pio/
+.platformio/
+.vscode/
+.idea/
+*.pioenvs/
+*.pio
+*.piolibdeps/
+
+# Compiled Object files
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dll
+*.dylib
+*.exe
+*.out
+*.elf
+*.bin
+*.hex
+*.map
+*.dmp
+*.lst
+*.tmp
+*.log
+*.cache
+*.swp
+*.bak
+*.old
+*.orig
