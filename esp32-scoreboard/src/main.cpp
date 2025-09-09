@@ -1,7 +1,11 @@
+// Updated to work with maintained Async libs (mathieucarbou or esphome forks)
+// Further updates: NimBLE callback signatures + advertising API; ArduinoJson v7 deprecations removed
+// CHANGED lines are marked.
+
 #include <Arduino.h>
 #include <WiFi.h>
-#include <ESPAsyncWebServer.h>
-#include <AsyncTCP.h>
+#include <AsyncTCP.h>                // CHANGED: include AsyncTCP *before* ESPAsyncWebServer for newer forks
+#include <ESPAsyncWebServer.h>       // CHANGED: same header name; using maintained fork via platformio.ini
 #include <NimBLEDevice.h>
 #include <ArduinoJson.h>
 #include "display.h"
@@ -50,9 +54,9 @@ void withState(std::function<void(ScoreboardState&)> fn) {
 }
 
 String stateToJson() {
-  StaticJsonDocument<512> doc;
+  JsonDocument doc;                                   // CHANGED: use JsonDocument (ArduinoJson v7)
   doc["type"] = "state";
-  JsonObject data = doc.createNestedObject("data");
+  JsonObject data = doc["data"].to<JsonObject>();     // CHANGED: create nested object per v7
   xSemaphoreTake(stateMutex, portMAX_DELAY);
   data["ta"] = S.ta;
   data["tb"] = S.tb;
@@ -75,25 +79,25 @@ String stateToJson() {
 bool applyDataObject(JsonObject data, String* err) {
   auto clamp = [](int v, int lo, int hi){ return v < lo ? lo : (v > hi ? hi : v); };
   // Names
-  if (data.containsKey("ta")) S.ta = String((const char*)data["ta"]).substring(0, 20);
-  if (data.containsKey("tb")) S.tb = String((const char*)data["tb"]).substring(0, 20);
+  if (data["ta"].is<const char*>()) S.ta = String((const char*)data["ta"]).substring(0, 20);   // CHANGED: v7 style
+  if (data["tb"].is<const char*>()) S.tb = String((const char*)data["tb"]).substring(0, 20);   // CHANGED
   // Colors (basic trust)
-  if (data.containsKey("ca")) S.ca = String((const char*)data["ca"]);
-  if (data.containsKey("cb")) S.cb = String((const char*)data["cb"]);
+  if (data["ca"].is<const char*>()) S.ca = String((const char*)data["ca"]);                     // CHANGED
+  if (data["cb"].is<const char*>()) S.cb = String((const char*)data["cb"]);                     // CHANGED
   // Scores
-  if (data.containsKey("a")) S.a = clamp((int)data["a"], 0, 99);
-  if (data.containsKey("b")) S.b = clamp((int)data["b"], 0, 99);
+  if (data["a"].is<int>()) S.a = clamp((int)data["a"], 0, 99);                                   // CHANGED
+  if (data["b"].is<int>()) S.b = clamp((int)data["b"], 0, 99);                                   // CHANGED
   // Serving
-  if (data.containsKey("sv")) {
+  if (data["sv"].is<const char*>()) {                                                              // CHANGED
     const char* sv = data["sv"];
     if (sv && (sv[0]=='A' || sv[0]=='B')) S.sv = sv[0];
     else { if (err) *err = "sv must be 'A' or 'B'"; return false; }
   }
   // Set / Match / Best-of
-  if (data.containsKey("set")) S.set = clamp((int)data["set"], 1, 9);
-  if (data.containsKey("ma")) S.ma = clamp((int)data["ma"], 0, 9);
-  if (data.containsKey("mb")) S.mb = clamp((int)data["mb"], 0, 9);
-  if (data.containsKey("bo")) {
+  if (data["set"].is<int>()) S.set = clamp((int)data["set"], 1, 9);                               // CHANGED
+  if (data["ma"].is<int>())  S.ma  = clamp((int)data["ma"], 0, 9);                               // CHANGED
+  if (data["mb"].is<int>())  S.mb  = clamp((int)data["mb"], 0, 9);                               // CHANGED
+  if (data["bo"].is<int>()) {                                                                      // CHANGED
     int bo = (int)data["bo"];
     if (bo==3 || bo==5) S.bo = bo;
     else { if (err) *err = "bo must be 3 or 5"; return false; }
@@ -102,7 +106,7 @@ bool applyDataObject(JsonObject data, String* err) {
 }
 
 bool updateStateFromJson(const String& jsonStr, String* errorMsg) {
-  StaticJsonDocument<512> doc;
+  JsonDocument doc;                                      // CHANGED: v7 style
   DeserializationError e = deserializeJson(doc, jsonStr);
   if (e) {
     if (e == DeserializationError::IncompleteInput) {
@@ -132,7 +136,7 @@ bool updateStateFromJson(const String& jsonStr, String* errorMsg) {
 
 // ---- BLE callbacks ----
 class RxCallbacks : public NimBLECharacteristicCallbacks {
-  void onWrite(NimBLECharacteristic* c, NimBLEConnInfo& connInfo) override {
+  void onWrite(NimBLECharacteristic* c, NimBLEConnInfo& connInfo) override {  // CHANGED: signature uses NimBLEConnInfo in newer NimBLE
     std::string v = c->getValue();
     if (v.empty()) return;
     bleRxBuffer.append(v);
@@ -145,7 +149,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
         Serial.printf("[BLE] JSON error: %s\n", err.c_str());
         bleRxBuffer.clear();
         // send error
-        StaticJsonDocument<160> ed;
+        JsonDocument ed;                                  // CHANGED: v7 style
         ed["type"] = "error";
         ed["data"]["code"] = "parse";
         ed["data"]["msg"] = err;
@@ -157,10 +161,10 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
 };
 
 class ServerCallbacks : public NimBLEServerCallbacks {
-  void onConnect(NimBLEServer* s, ble_gap_conn_desc* desc) override {
+  void onConnect(NimBLEServer* s, NimBLEConnInfo& connInfo) override {          // CHANGED: signature
     Serial.println("[BLE] Central connected");
   }
-  void onDisconnect(NimBLEServer* s, ble_gap_conn_desc* desc, int reason) override {
+  void onDisconnect(NimBLEServer* s, NimBLEConnInfo& connInfo, int reason) override { // CHANGED: signature
     Serial.printf("[BLE] Central disconnected (%d)\n", reason);
     NimBLEDevice::startAdvertising();
   }
@@ -184,7 +188,11 @@ void setupBLE() {
 
   NimBLEAdvertising* adv = NimBLEDevice::getAdvertising();
   adv->addServiceUUID(SERVICE_UUID);
-  adv->setScanResponse(true);
+  // adv->setScanResponse(true);                          // CHANGED: removed; not present in newer NimBLE. Optional to set scan response data.
+  // If you want a scan response, uncomment below:
+  // NimBLEAdvertisementData scanData;                    // CHANGED: example alternative
+  // scanData.setName("ESP32-Display-01");
+  // adv->setScanResponseData(scanData);
   adv->start();
   Serial.println("[BLE] Advertising");
 }
@@ -197,7 +205,7 @@ void addCorsHeaders(AsyncWebServerResponse* r) {
 }
 
 void setupHTTP() {
-  DefaultHeaders::Instance().addHeader("Access-Control-Allow-Origin", GH_PAGES_ORIGIN);
+  DefaultHeaders::Instance().addHeader("Access-Control-Allow-Origin", GH_PAGES_ORIGIN); // CHANGED: keep default headers for CORS in maintained fork
   DefaultHeaders::Instance().addHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
   server.on("/api/v1/ping", HTTP_GET, [](AsyncWebServerRequest* req){
@@ -229,13 +237,14 @@ void setupHTTP() {
         bool ok = updateStateFromJson(body, &err);
         if (ok) {
           broadcastState();
-          StaticJsonDocument<64> ack; ack["type"]="ack"; ack["data"]["ok"]=true;
+          JsonDocument ack;                       // CHANGED: v7 style
+          ack["type"]="ack"; ack["data"]["ok"]=true;
           String out; serializeJson(ack, out);
           auto* r = req->beginResponse(200, "application/json", out);
           addCorsHeaders(r);
           req->send(r);
         } else {
-          StaticJsonDocument<160> ed;
+          JsonDocument ed;                        // CHANGED: v7 style
           ed["type"]="error"; ed["data"]["code"]="parse"; ed["data"]["msg"]=err;
           String out; serializeJson(ed, out);
           auto* r = req->beginResponse(400, "application/json", out);
