@@ -188,11 +188,10 @@ void setupBLE() {
 
   NimBLEAdvertising* adv = NimBLEDevice::getAdvertising();
   adv->addServiceUUID(SERVICE_UUID);
-  // adv->setScanResponse(true);                          // CHANGED: removed; not present in newer NimBLE. Optional to set scan response data.
-  // If you want a scan response, uncomment below:
-  // NimBLEAdvertisementData scanData;                    // CHANGED: example alternative
-  // scanData.setName("ESP32-Display-01");
-  // adv->setScanResponseData(scanData);
+  // Include the device name in the scan response so it shows up in scanner UIs
+  NimBLEAdvertisementData scanData;                    // CHANGED: advertise name via scan response
+  scanData.setName("VSDisplay");
+  adv->setScanResponseData(scanData);
   adv->start();
   Serial.println("[BLE] Advertising");
 }

@@ -81,38 +81,98 @@ public:
     void render(const ScoreboardState& s) override {
       Serial.println("[DISPLAY] render() called");
       tft.fillScreen(TFT_BLACK);
-      // Header row: team names (white)
-      tft.setCursor(6, 6);
-      tft.setTextFont(1);
-      tft.setTextSize(2);
-      tft.setTextColor(TFT_WHITE, TFT_BLACK);
-      tft.printf("%s  %s\n", s.ta.c_str(), s.tb.c_str());
 
-      // Team scores in team colors
+      // Common
+      tft.setTextFont(1);
+
+      // Colors
       uint16_t colA = hexTo565(s.ca);
       uint16_t colB = hexTo565(s.cb);
-      int margin = 20;
-      int digitW = 6 * 4; // GLCD font width (6) * size (4)
-      int scoreWidth = digitW * 2; // two digits
-      int leftX = 6;
-      int rightX = tft.width() - margin - scoreWidth;
-      int scoreY = 40;
 
-      tft.setTextSize(4);
-      tft.setTextColor(colA, TFT_BLACK);
-      tft.setCursor(leftX, scoreY);
-      tft.printf("%02d", s.a);
+      // Layout metrics for a clean two-column grid
+      const int W = tft.width();
+      const int H = tft.height();
+      const int pad = 10;            // outer + gutter padding
+      const int colW = (W - pad * 3) / 2; // two columns + 3 paddings
+      const int colAX = pad;
+      const int colBX = pad * 2 + colW;
+      const int topY = 8;
 
-      tft.setTextColor(colB, TFT_BLACK);
-      tft.setCursor(rightX, scoreY);
-      tft.printf("%02d", s.b);
+      auto calcWidth = [](const String& txt, int size){ return (int)(txt.length() * 6 * size); };
 
-      // Footer details (white)
+      // Team names (centered in each column)
       tft.setTextSize(2);
       tft.setTextColor(TFT_WHITE, TFT_BLACK);
-      tft.setCursor(6, 110);
-      tft.printf("Serve: %c  Set: %d  Match:%d-%d  Bo%d",
-        s.sv, s.set, s.ma, s.mb, s.bo);
+      int nameH = 8 * 2; // GLCD height (8) * size
+      // A name
+      int aNameW = calcWidth(s.ta, 2);
+      int aNameX = colAX + (colW - aNameW) / 2;
+      tft.setCursor(aNameX, topY);
+      tft.print(s.ta);
+      // B name
+      int bNameW = calcWidth(s.tb, 2);
+      int bNameX = colBX + (colW - bNameW) / 2;
+      tft.setCursor(bNameX, topY);
+      tft.print(s.tb);
+
+      // Serve indicator: small yellow dot near serving team name
+      int siY = topY + nameH / 2;
+      if (s.sv == 'A' || s.sv == 'a') {
+        tft.fillCircle(colAX + 4, siY, 3, TFT_YELLOW);
+      } else {
+        tft.fillCircle(colBX + 4, siY, 3, TFT_YELLOW);
+      }
+
+      // Scores (large, centered per column, in team colors)
+      const int scoreSize = 5; // bigger scores
+      const int scoreY = topY + nameH + 8; // spacing below names
+      tft.setTextSize(scoreSize);
+      // A score
+      String aScore = String(s.a < 100 ? (s.a < 10 ? "0" : "") : "") + String(s.a);
+      int aScoreW = calcWidth(aScore, scoreSize);
+      int aScoreX = colAX + (colW - aScoreW) / 2;
+      tft.setTextColor(colA, TFT_BLACK);
+      tft.setCursor(aScoreX, scoreY);
+      tft.print(aScore);
+      // B score
+      String bScore = String(s.b < 100 ? (s.b < 10 ? "0" : "") : "") + String(s.b);
+      int bScoreW = calcWidth(bScore, scoreSize);
+      int bScoreX = colBX + (colW - bScoreW) / 2;
+      tft.setTextColor(colB, TFT_BLACK);
+      tft.setCursor(bScoreX, scoreY);
+      tft.print(bScore);
+
+      // Row of per-team small stats under scores (optional: set wins)
+      tft.setTextSize(2);
+      tft.setTextColor(TFT_WHITE, TFT_BLACK);
+      int statsY = scoreY + (8 * scoreSize) + 6; // below large digits
+      // A small stat: sets won (ma)
+      {
+        String at = String("Set ") + String(s.set) + String("  W:") + String(s.ma);
+        int atW = calcWidth(at, 2);
+        int atX = colAX + (colW - atW) / 2;
+        tft.setCursor(atX, statsY);
+        tft.print(at);
+      }
+      // B small stat: sets won (mb)
+      {
+        String bt = String("Set ") + String(s.set) + String("  W:") + String(s.mb);
+        int btW = calcWidth(bt, 2);
+        int btX = colBX + (colW - btW) / 2;
+        tft.setCursor(btX, statsY);
+        tft.print(bt);
+      }
+
+      // Footer centered summary
+      String footer = String("Match ") + String(s.ma) + String("-") + String(s.mb) + String("  Bo") + String(s.bo);
+      int fSize = 2;
+      int fW = calcWidth(footer, fSize);
+      int fX = (W - fW) / 2;
+      int fY = H - (8 * fSize) - 6;
+      tft.setTextSize(fSize);
+      tft.setTextColor(TFT_WHITE, TFT_BLACK);
+      tft.setCursor(fX, fY);
+      tft.print(footer);
     }
   };
 #endif

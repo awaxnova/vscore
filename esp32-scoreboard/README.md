@@ -1,3 +1,12 @@
+# CONTROLLER PAGE: 
+  https://awaxnova.github.io/vscore/
+# DEVICE: 
+  https://www.amazon.com/dp/B0DRFZ2FP9?smid=A1PKC2PUMNR8VD&ref_=chk_typ_imgToDp&th=1
+# DATASHEET: 
+  https://www.lcdwiki.com/3.2inch_ESP32-32E_Display
+# MANUFACTURER: 
+  https://hosyond.com/
+
 # ESP32 Scoreboard (BLE + HTTP)
 
 Matches the PWA protocol (JSON over BLE UART-style and HTTP).
@@ -64,3 +73,13 @@ curl http://192.168.4.1/api/v1/state
 - Add a scrolling stat window showing more info: rotation, serve order, points per server, etc...
 - Add a power switch inline with the battery using 1.2mm jst connectors.
 - Add a team background color, which would be a backdrop upon which to display their score and other info.
+- Show info on how to connect, like a QR code upon startup to get the phone connected using a randomized credential, 
+  and then upon request (tap screen or command), a QR code that gives someone the wifi info, so they can maintain the game state/stats over wifi as well.
+  Screen tap cycles through the QR codes available, including a way to reset credentials to a new QR code for BLE or WIFI.
+- Handle a click on the screen to flip the screen to a different render handler... let's have this alternate handler show the connection QR codes for the BLE and the WIFI... or only WIFI if BLE is connected already.
+- Handle a click on a QR code to update credentials and boot all connections.
+- Hold score to clear
+- Allow for set/win manipulation... for sets won, show a circle of the appropriate color fg/bg between the columns.
+- When the serve moves, add an opponent point before moving it.
+- When the serve stays, mark a server point and leave it in place.
+- For a redo, indicate it in the log with a double thumbs up button - allow for point adjustment and strikethrough the last server's stat.
