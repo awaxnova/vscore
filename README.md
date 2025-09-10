@@ -1,5 +1,9 @@
 PAGES: https://awaxnova.github.io/vscore/
 
+DEVICE: https://www.amazon.com/dp/B0DRFZ2FP9?smid=A1PKC2PUMNR8VD&ref_=chk_typ_imgToDp&th=1
+DATASHEET: https://www.lcdwiki.com/3.2inch_ESP32-32E_Display
+MANUFACTURER: https://hosyond.com/
+
 # Scoreboard PWA (BLE + Wi‑Fi fallback)
 
 A portable controller UI that talks to an ESP32‑based scoreboard display using **Web Bluetooth (BLE GATT)** when available, and falls back to **HTTP (Wi‑Fi SoftAP or LAN)** when not.
