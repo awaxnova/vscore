@@ -42,6 +42,15 @@
 #define SPI_TOUCH_FREQUENCY  2500000
 
 // ---- Font / features (optional trims) ----
+// Enable basic GLCD font (scalable via setTextSize)
+#define LOAD_GLCD
+// Optionally enable additional fonts if needed
+// #define LOAD_FONT2
+// #define LOAD_FONT4
+// #define LOAD_FONT6
+// #define LOAD_FONT7
+// #define LOAD_FONT8
+
 #define SMOOTH_FONT
 
 // Rotation is handled in code (display.h) via setRotation().

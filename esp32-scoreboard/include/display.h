@@ -35,6 +35,7 @@ public:
     TFT_eSPI tft;
   public:
     void begin() override {
+      Serial.println("[DISPLAY] Using TFT_eSPI renderer");
 #ifdef TFT_BL
       pinMode(TFT_BL, OUTPUT);
 #ifdef TFT_BACKLIGHT_ON
@@ -45,13 +46,22 @@ public:
 #endif
       tft.init();
       tft.setRotation(1); // adjust as needed
+      // Quick test pattern to verify panel output
+      tft.fillScreen(TFT_RED);   delay(150);
+      tft.fillScreen(TFT_GREEN); delay(150);
+      tft.fillScreen(TFT_BLUE);  delay(150);
       tft.fillScreen(TFT_BLACK);
-      tft.setTextFont(2);
+      // Use GLCD font (1) so setTextSize scaling works
+      tft.setTextFont(1);
       tft.setTextColor(TFT_WHITE, TFT_BLACK);
+      tft.setCursor(6, 6);
+      tft.print("TFT init OK");
     }
     void render(const ScoreboardState& s) override {
+      Serial.println("[DISPLAY] render() called");
       tft.fillScreen(TFT_BLACK);
       tft.setCursor(6, 6);
+      tft.setTextFont(1);
       tft.setTextSize(2);
       tft.printf("%s  %s\n", s.ta.c_str(), s.tb.c_str());
       tft.setTextSize(4);
