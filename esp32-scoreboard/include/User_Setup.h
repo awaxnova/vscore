@@ -4,11 +4,12 @@
 // If your controller/pins differ, adjust below accordingly.
 
 // ---- Display driver ----
-// Common for many 320x240 3.2" modules is ILI9341. If your page says
-// ST7789, ST7735, or other, change the driver define accordingly.
-#define ILI9341_DRIVER
+// Configure for ST7789 controller (supports 240x320 panels)
+// If colours appear swapped, try uncommenting TFT_RGB_ORDER=TFT_BGR below.
+#define ST7789_DRIVER
+// #define TFT_RGB_ORDER TFT_BGR  // Uncomment if colours are inverted
 
-// ---- Display resolution ----
+// ---- Display resolution ---- (ST7789 240x320)
 #define TFT_WIDTH  240
 #define TFT_HEIGHT 320
 
