@@ -36,7 +36,12 @@ Matches the PWA protocol (JSON over BLE UART-style and HTTP).
 - TX (notify): `6e400003-b5a3-f393-e0a9-e50e24dcca9e`
 
 ## TFT (optional)
-Uncomment `-D USE_TFT_ESPI` in `platformio.ini` and provide a proper **TFT_eSPI** User_Setup for your ST7789 screen.
+TFT support is enabled via **TFT_eSPI**.
+
+- Enabled: `-D USE_TFT_ESPI` and TFT_eSPI dependency are configured in `platformio.ini`.
+- Local config: edit `include/User_Setup.h` with the correct controller and pin map for your ESP32-32E 3.2" board. Defaults assume ILI9341 240x320 and VSPI pins.
+- If the screen is rotated, tweak `setRotation()` inside `include/display.h`.
+- If your board has a backlight pin, adjust `TFT_BL` in `include/User_Setup.h`.
 
 ## Curl test
 ```bash

@@ -35,6 +35,14 @@ public:
     TFT_eSPI tft;
   public:
     void begin() override {
+#ifdef TFT_BL
+      pinMode(TFT_BL, OUTPUT);
+#ifdef TFT_BACKLIGHT_ON
+      digitalWrite(TFT_BL, TFT_BACKLIGHT_ON);
+#else
+      digitalWrite(TFT_BL, HIGH);
+#endif
+#endif
       tft.init();
       tft.setRotation(1); // adjust as needed
       tft.fillScreen(TFT_BLACK);
