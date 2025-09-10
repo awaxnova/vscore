@@ -7,7 +7,7 @@
 // Configure for ST7789 controller (supports 240x320 panels)
 // If colours appear swapped, try uncommenting TFT_RGB_ORDER=TFT_BGR below.
 #define ST7789_DRIVER
-// #define TFT_RGB_ORDER TFT_BGR  // Uncomment if colours are inverted
+#define TFT_RGB_ORDER TFT_BGR  // Colours were swapped; enable BGR order
 
 // ---- Display resolution ---- (ST7789 240x320)
 #define TFT_WIDTH  240

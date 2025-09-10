@@ -55,3 +55,12 @@ curl http://192.168.4.1/api/v1/state
 ## Notes
 - BLE writes may be chunked; the code accumulates until valid JSON parses.
 - JSON size kept small; MTU set to 247 to help notifications.
+
+
+## Future Features TODO
+- Add a security feature for making updates.  Maybe a code that accompanys the administration or connections, but also a whitelist of admin devices.
+- Add colors for teams to the display
+- Fix formatting for the stats
+- Add a scrolling stat window showing more info: rotation, serve order, points per server, etc...
+- Add a power switch inline with the battery using 1.2mm jst connectors.
+- Add a team background color, which would be a backdrop upon which to display their score and other info.
