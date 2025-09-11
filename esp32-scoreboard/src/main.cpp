@@ -40,11 +40,13 @@ NimBLEServer* pServer = nullptr;
 NimBLECharacteristic* pTx = nullptr;
 NimBLECharacteristic* pRx = nullptr;
 std::string bleRxBuffer;
+volatile bool gPendingBroadcast = false;
 
 // Forward decl
 String stateToJson();
 bool updateStateFromJson(const String& jsonStr, String* errorMsg);
 void broadcastState();
+void scheduleBroadcast();
 
 // ---- Utilities ----
 void withState(std::function<void(ScoreboardState&)> fn) {
@@ -69,6 +71,7 @@ String stateToJson() {
   data["ma"] = S.ma;
   data["mb"] = S.mb;
   data["bo"] = S.bo;
+  data["ble"] = S.ble;
   xSemaphoreGive(stateMutex);
 
   String out;
@@ -143,7 +146,7 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
     String err;
     if (updateStateFromJson(String(bleRxBuffer.c_str()), &err)) {
       bleRxBuffer.clear();
-      broadcastState();
+      scheduleBroadcast();
     } else {
       if (err != "incomplete") {
         Serial.printf("[BLE] JSON error: %s\n", err.c_str());
@@ -163,10 +166,14 @@ class RxCallbacks : public NimBLECharacteristicCallbacks {
 class ServerCallbacks : public NimBLEServerCallbacks {
   void onConnect(NimBLEServer* s, NimBLEConnInfo& connInfo) override {          // CHANGED: signature
     Serial.println("[BLE] Central connected");
+    withState([](ScoreboardState& st){ st.ble = true; });
+    scheduleBroadcast();
   }
   void onDisconnect(NimBLEServer* s, NimBLEConnInfo& connInfo, int reason) override { // CHANGED: signature
     Serial.printf("[BLE] Central disconnected (%d)\n", reason);
+    withState([](ScoreboardState& st){ st.ble = false; });
     NimBLEDevice::startAdvertising();
+    scheduleBroadcast();
   }
 };
 
@@ -235,7 +242,7 @@ void setupHTTP() {
         String err;
         bool ok = updateStateFromJson(body, &err);
         if (ok) {
-          broadcastState();
+          scheduleBroadcast();
           JsonDocument ack;                       // CHANGED: v7 style
           ack["type"]="ack"; ack["data"]["ok"]=true;
           String out; serializeJson(ack, out);
@@ -282,6 +289,9 @@ void broadcastState() {
   String json = stateToJson();
   events.send(json.c_str(), "state");
 }
+void scheduleBroadcast() {
+  gPendingBroadcast = true;
+}
 
 void setup() {
   Serial.begin(115200);
@@ -300,9 +310,17 @@ void setup() {
   setupBLE();
 
   // Push initial state
-  broadcastState();
+  scheduleBroadcast();
 }
 
 void loop() {
-  // Nothing to do; events are interrupt/callback-driven.
+  // Poll display for touch to toggle views
+  renderer->loop();
+  if (gPendingBroadcast) {
+    gPendingBroadcast = false;
+    broadcastState();
+  }
 }
+
+
+
