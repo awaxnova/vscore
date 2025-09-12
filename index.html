@@ -21,31 +21,13 @@
     <div class="stack">
       <div class="card">
         <div class="header">
-          <h3>Teams</h3>
+          <h3>Match Controls</h3>
           <div class="hstack">
             <button id="swapBtn" class="tonal">Swap sides</button>
           </div>
         </div>
-        <div class="row">
-          <div class="stack">
-            <input id="teamAName" class="input" placeholder="Team A name" maxlength="20" />
-            <div class="hstack">
-              <label class="small">Color</label>
-              <input id="teamAColor" type="color" value="#42a5f5" style="width:60px; padding: 4px;" />
-            </div>
-          </div>
-          <div class="stack">
-            <input id="teamBName" class="input" placeholder="Team B name" maxlength="20" />
-            <div class="hstack">
-              <label class="small">Color</label>
-              <input id="teamBColor" type="color" value="#ef5350" style="width:60px; padding: 4px;" />
-            </div>
-          </div>
-        </div>
-      </div>
 
-      <div class="card">
-        <div class="row">
+        <div class="stack">
           <div class="stack center">
             <div class="small">Serving</div>
             <div class="hstack center" style="justify-content:center">
@@ -53,19 +35,109 @@
               <label class="hstack"><input type="radio" name="serving" value="B" id="serveB"> <span class="small">Team B</span></label>
             </div>
           </div>
-          <div class="stack row">
-            <div class="stack center card">
-              <div id="scoreA" class="score">0</div>
-              <div class="hstack">
-                <button id="plusA" class="primary">+1</button>
-                <button id="minusA" class="tonal">-1</button>
+
+          <div class="row">
+            <!-- Team A column -->
+            <div class="stack" id="teamASection">
+              <input id="teamAName" class="input" placeholder="Team A name" maxlength="20" />
+              <div class="row">
+                <div class="hstack">
+                  <label class="small">Text Color</label>
+                  <input id="teamAColor" type="color" value="#42a5f5" style="width:60px; padding: 4px;" />
+                </div>
+                <div class="hstack">
+                  <label class="small">Background</label>
+                  <input id="teamABgColor" type="color" value="#0c1220" style="width:60px; padding: 4px;" />
+                </div>
+              </div>
+
+              <div class="stack center card">
+                <div class="small">Current Score</div>
+                <div id="scoreA" class="score">0</div>
+                <div class="hstack">
+                  <button id="plusA" class="primary">+1 point</button>
+                  <button id="minusA" class="tonal">-1 point</button>
+                </div>
+              </div>
+
+              <div class="row-3">
+                <button id="sideoutA" class="tonal">Side Out Won Serve</button>
+                <button id="servedScoredA" class="ok">Served and Scored</button>
+                <button id="voidPrevA" class="tonal">Void Previous Point</button>
+              </div>
+              <div class="row-3">
+                <button id="wonSetA" class="ok">Won Set</button>
+                <button id="clearSetA" class="destructive">Clear Set</button>
+                <div></div>
+              </div>
+
+              <div class="stack">
+                <label class="small">Rotation (player numbers)</label>
+                <div class="row-3">
+                  <input id="rotationA1" class="input" type="number" min="0" placeholder="#" />
+                  <input id="rotationA2" class="input" type="number" min="0" placeholder="#" />
+                  <input id="rotationA3" class="input" type="number" min="0" placeholder="#" />
+                  <input id="rotationA4" class="input" type="number" min="0" placeholder="#" />
+                  <input id="rotationA5" class="input" type="number" min="0" placeholder="#" />
+                  <input id="rotationA6" class="input" type="number" min="0" placeholder="#" />
+                </div>
+              </div>
+
+              <div class="stack">
+                <label class="small">Score Log (reason / scorer / time)</label>
+                <ul id="reasonsA" class="small" style="max-height: 140px; overflow:auto; margin:0; padding-left: 16px;"></ul>
               </div>
             </div>
-            <div class="stack center card">
-              <div id="scoreB" class="score">0</div>
-              <div class="hstack">
-                <button id="plusB" class="primary">+1</button>
-                <button id="minusB" class="tonal">-1</button>
+
+            <!-- Team B column -->
+            <div class="stack" id="teamBSection">
+              <input id="teamBName" class="input" placeholder="Team B name" maxlength="20" />
+              <div class="row">
+                <div class="hstack">
+                  <label class="small">Text Color</label>
+                  <input id="teamBColor" type="color" value="#ef5350" style="width:60px; padding: 4px;" />
+                </div>
+                <div class="hstack">
+                  <label class="small">Background</label>
+                  <input id="teamBBgColor" type="color" value="#0c1220" style="width:60px; padding: 4px;" />
+                </div>
+              </div>
+
+              <div class="stack center card">
+                <div class="small">Current Score</div>
+                <div id="scoreB" class="score">0</div>
+                <div class="hstack">
+                  <button id="plusB" class="primary">+1 point</button>
+                  <button id="minusB" class="tonal">-1 point</button>
+                </div>
+              </div>
+
+              <div class="row-3">
+                <button id="sideoutB" class="tonal">Side Out Won Serve</button>
+                <button id="servedScoredB" class="ok">Served and Scored</button>
+                <button id="voidPrevB" class="tonal">Void Previous Point</button>
+              </div>
+              <div class="row-3">
+                <button id="wonSetB" class="ok">Won Set</button>
+                <button id="clearSetB" class="destructive">Clear Set</button>
+                <div></div>
+              </div>
+
+              <div class="stack">
+                <label class="small">Rotation (player numbers)</label>
+                <div class="row-3">
+                  <input id="rotationB1" class="input" type="number" min="0" placeholder="#" />
+                  <input id="rotationB2" class="input" type="number" min="0" placeholder="#" />
+                  <input id="rotationB3" class="input" type="number" min="0" placeholder="#" />
+                  <input id="rotationB4" class="input" type="number" min="0" placeholder="#" />
+                  <input id="rotationB5" class="input" type="number" min="0" placeholder="#" />
+                  <input id="rotationB6" class="input" type="number" min="0" placeholder="#" />
+                </div>
+              </div>
+
+              <div class="stack">
+                <label class="small">Score Log (reason / scorer / time)</label>
+                <ul id="reasonsB" class="small" style="max-height: 140px; overflow:auto; margin:0; padding-left: 16px;"></ul>
               </div>
             </div>
           </div>
