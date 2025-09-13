@@ -64,6 +64,8 @@ String stateToJson() {
   data["tb"] = S.tb;
   data["ca"] = S.ca;
   data["cb"] = S.cb;
+  data["abg"] = S.abg;
+  data["bbg"] = S.bbg;
   data["a"] = S.a;
   data["b"] = S.b;
   data["sv"] = String(S.sv);
@@ -72,6 +74,32 @@ String stateToJson() {
   data["mb"] = S.mb;
   data["bo"] = S.bo;
   data["ble"] = S.ble;
+  // rotations
+  {
+    JsonArray ra = data["ra"].to<JsonArray>();
+    for (int i=0;i<6;i++) ra.add(S.ra[i]);
+    JsonArray rb = data["rb"].to<JsonArray>();
+    for (int i=0;i<6;i++) rb.add(S.rb[i]);
+    data["rsa"] = (int)S.rsa;
+    data["rsb"] = (int)S.rsb;
+  }
+  // last 4 logs per team
+  {
+    JsonArray la = data["la"].to<JsonArray>();
+    for (int i=0;i<S.laCount; i++) {
+      JsonObject e = la.add<JsonObject>();
+      e["reason"] = S.la[i].reason;
+      e["scorer"] = S.la[i].scorer;
+      e["ts"] = (uint32_t)S.la[i].ts;
+    }
+    JsonArray lb = data["lb"].to<JsonArray>();
+    for (int i=0;i<S.lbCount; i++) {
+      JsonObject e = lb.add<JsonObject>();
+      e["reason"] = S.lb[i].reason;
+      e["scorer"] = S.lb[i].scorer;
+      e["ts"] = (uint32_t)S.lb[i].ts;
+    }
+  }
   xSemaphoreGive(stateMutex);
 
   String out;
@@ -87,6 +115,8 @@ bool applyDataObject(JsonObject data, String* err) {
   // Colors (basic trust)
   if (data["ca"].is<const char*>()) S.ca = String((const char*)data["ca"]);                     // CHANGED
   if (data["cb"].is<const char*>()) S.cb = String((const char*)data["cb"]);                     // CHANGED
+  if (data["abg"].is<const char*>()) S.abg = String((const char*)data["abg"]);
+  if (data["bbg"].is<const char*>()) S.bbg = String((const char*)data["bbg"]);
   // Scores
   if (data["a"].is<int>()) S.a = clamp((int)data["a"], 0, 99);                                   // CHANGED
   if (data["b"].is<int>()) S.b = clamp((int)data["b"], 0, 99);                                   // CHANGED
@@ -95,6 +125,50 @@ bool applyDataObject(JsonObject data, String* err) {
     const char* sv = data["sv"];
     if (sv && (sv[0]=='A' || sv[0]=='B')) S.sv = sv[0];
     else { if (err) *err = "sv must be 'A' or 'B'"; return false; }
+  }
+  // Rotations and current server
+  if (data["ra"].is<JsonArray>()) {
+    JsonArray ra = data["ra"].as<JsonArray>();
+    for (int i=0;i<6;i++) {
+      if (i < (int)ra.size() && ra[i].is<const char*>()) S.ra[i] = String((const char*)ra[i]);
+      else S.ra[i] = String("");
+    }
+  }
+  if (data["rb"].is<JsonArray>()) {
+    JsonArray rb = data["rb"].as<JsonArray>();
+    for (int i=0;i<6;i++) {
+      if (i < (int)rb.size() && rb[i].is<const char*>()) S.rb[i] = String((const char*)rb[i]);
+      else S.rb[i] = String("");
+    }
+  }
+  if (data["rsa"].is<int>()) S.rsa = (uint8_t)clamp((int)data["rsa"], 0, 5);
+  if (data["rsb"].is<int>()) S.rsb = (uint8_t)clamp((int)data["rsb"], 0, 5);
+  // Last 4 logs per team (keep only the tail)
+  if (data["la"].is<JsonArray>()) {
+    JsonArray la = data["la"].as<JsonArray>();
+    int n = (int)la.size();
+    int start = n > 4 ? n - 4 : 0;
+    S.laCount = 0;
+    for (int i=start; i<n && S.laCount < 4; i++) {
+      JsonObject e = la[i].as<JsonObject>();
+      S.la[S.laCount].reason = String((const char*)(e["reason"] | ""));
+      S.la[S.laCount].scorer = String((const char*)(e["scorer"] | ""));
+      S.la[S.laCount].ts = (uint32_t)(e["ts"] | 0);
+      S.laCount++;
+    }
+  }
+  if (data["lb"].is<JsonArray>()) {
+    JsonArray lb = data["lb"].as<JsonArray>();
+    int n = (int)lb.size();
+    int start = n > 4 ? n - 4 : 0;
+    S.lbCount = 0;
+    for (int i=start; i<n && S.lbCount < 4; i++) {
+      JsonObject e = lb[i].as<JsonObject>();
+      S.lb[S.lbCount].reason = String((const char*)(e["reason"] | ""));
+      S.lb[S.lbCount].scorer = String((const char*)(e["scorer"] | ""));
+      S.lb[S.lbCount].ts = (uint32_t)(e["ts"] | 0);
+      S.lbCount++;
+    }
   }
   // Set / Match / Best-of
   if (data["set"].is<int>()) S.set = clamp((int)data["set"], 1, 9);                               // CHANGED

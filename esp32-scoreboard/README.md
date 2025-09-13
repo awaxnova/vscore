@@ -83,3 +83,5 @@ curl http://192.168.4.1/api/v1/state
 - When the serve moves, add an opponent point before moving it.
 - When the serve stays, mark a server point and leave it in place.
 - For a redo, indicate it in the log with a double thumbs up button - allow for point adjustment and strikethrough the last server's stat.
+- battery level indicator?
+- charging indicator?
